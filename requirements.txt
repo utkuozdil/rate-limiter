@@ -1,0 +1,4 @@
+boto3~=1.35.82
+pytest
+botocore~=1.35.82
+python-dotenv~=1.0.1

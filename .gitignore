@@ -58,3 +58,4 @@ swagger_output/
 # Misc
 .DS_Store
 Thumbs.db
+.env

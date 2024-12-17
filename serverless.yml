@@ -1,0 +1,32 @@
+service: rate-limiter
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: us-east-1
+
+plugins:
+  - serverless-dotenv-plugin
+
+functions:
+  rateLimiter:
+    handler: src/handlers/app.handler
+    events:
+      - http:
+          path: rate-limit
+          method: get
+          cors: true
+
+resources:
+  Resources:
+    RateLimitTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: RateLimitTable
+        AttributeDefinitions:
+          - AttributeName: "identifier"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "identifier"
+            KeyType: "HASH"
+        BillingMode: PAY_PER_REQUEST
