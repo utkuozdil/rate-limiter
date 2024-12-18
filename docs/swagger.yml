@@ -1,0 +1,212 @@
+openapi: 3.0.0
+info:
+  title: Rate Limiter API
+  description: An API to limit and control requests based on IP address.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /rate-limit:
+    get:
+      summary: Check rate limit for a specific IP address
+      description: Endpoint to check if a request is allowed based on rate-limiting rules.
+      parameters:
+        - name: X-Forwarded-For
+          in: header
+          required: true
+          description: The IP address of the client making the request.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Request allowed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Request allowed."
+        '429':
+          description: Too many requests.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Too Many Requests. Try again later."
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Internal server error."
+  /admin/ip-status:
+    post:
+      summary: Add or update the status of an IP address
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ip
+                - status
+              properties:
+                ip:
+                  type: string
+                  description: The IP address to update.
+                  example: "192.168.1.1"
+                status:
+                  type: string
+                  description: The status to assign to the IP (whitelist or blacklist).
+                  enum:
+                    - whitelist
+                    - blacklist
+                  example: "blacklist"
+      responses:
+        "200":
+          description: IP status updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "IP address status has been updated"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid request. Provide 'ip' and 'status' as 'whitelist' or 'blacklist'."
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Internal server error"
+  /admin/reset-limit:
+    post:
+      summary: Reset limit for given IP address
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ip
+              properties:
+                ip:
+                  type: string
+                  description: The IP address to update.
+                  example: "192.168.1.1"
+      responses:
+        "200":
+          description: Rate limit has been reset successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Rate limit has been reset"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid request. Provide 'ip' to reset rate limit"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Internal server error"
+  /admin/configuration:
+    put:
+      summary: Update limit configuration for given IP address
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ip
+                - threshold
+                - time_window
+              properties:
+                ip:
+                  type: string
+                  description: The IP address to update.
+                  example: "192.168.1.1"
+                threshold:
+                  type: string
+                  description: The IP address to update.
+                  example: "192.168.1.1"
+                time_window:
+                  type: string
+                  description: The IP address to update.
+                  example: "192.168.1.1"
+      responses:
+        "200":
+          description: Rate limit has been reset successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Rate limit has been reset"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid request. Provide 'ip' to reset rate limit"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Internal server error"

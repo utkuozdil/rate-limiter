@@ -1,0 +1,90 @@
+service: rate-limiter
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: us-east-1
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:GetItem"
+        - "dynamodb:PutItem"
+        - "dynamodb:DescribeTable"
+      Resource:
+        - "arn:aws:dynamodb:us-east-1:*:table/RateLimitTable"
+        - "arn:aws:dynamodb:us-east-1:*:table/IPListTable"
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-python-requirements
+
+functions:
+  rateLimiter:
+    handler: src/handlers/rate_limit.handler
+    events:
+      - http:
+          path: rate-limit
+          method: get
+          cors: true
+  updateIPStatus:
+    handler: src/handlers/manage_ip_status.handler
+    events:
+      - http:
+          path: admin/ip-status
+          method: post
+          cors: true
+  resetLimit:
+    handler: src/handlers/reset_limit.handler
+    events:
+      - http:
+          path: admin/reset-limit
+          method: post
+          cors: true
+  UpdateConfiguration:
+    handler: src/handlers/update_config.handler
+    events:
+      - http:
+          path: admin/configuration
+          method: put
+          cors: true
+
+custom:
+  pythonRequirements:
+    dockerizePip: true    # Ensures compatibility with Lambda runtime
+    slim: true            # Reduces package size
+    strip: false          # Keep debug symbols for better error logs
+
+package:
+  exclude:
+    - node_modules/**
+    - venv/**             # Exclude virtual environment
+    - .pytest_cache/**    # Exclude pytest cache
+    - tests/**            # Exclude tests
+  include:
+    - src/**              # Include application source files
+    - requirements.txt
+
+resources:
+  Resources:
+    RateLimitTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: RateLimitTable
+        AttributeDefinitions:
+          - AttributeName: "identifier"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "identifier"
+            KeyType: "HASH"
+        BillingMode: PAY_PER_REQUEST
+    IPListTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: IPListTable
+        AttributeDefinitions:
+          - AttributeName: "ip"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "ip"
+            KeyType: "HASH"
+        BillingMode: PAY_PER_REQUEST
