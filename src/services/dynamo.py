@@ -7,14 +7,15 @@ class DynamoHelper:
         self.dynamo = boto3.resource("dynamodb")
         self.table = self.dynamo.Table(table_name)
 
+    def _handle_error(self, message):
+        raise Exception(message)
+
     def get_rate_limit_data(self, identifier: str) -> dict:
         try:
             response = self.table.get_item(Key={"identifier": identifier})
             return response.get("Item", None)
         except ClientError as e:
-            error_message = f"Error retrieving data for '{identifier}': {e.response['Error']['Message']}"
-            print(error_message)
-            raise Exception(error_message)
+            self._handle_error(f"Error retrieving data for '{identifier}': {e.response['Error']['Message']}")
 
     def update_rate_limit_data(self, identifier: str, request_count: int, time_window: int, threshold: int,
                                window_seconds: int):
@@ -29,23 +30,18 @@ class DynamoHelper:
                 }
             )
         except ClientError as e:
-            error_message = f"Error updating data for '{identifier}': {e.response['Error']['Message']}"
-            print(error_message)
-            raise Exception(error_message)
+            self._handle_error(f"Error updating data for '{identifier}': {e.response['Error']['Message']}")
 
     def update_ip_status(self, ip_address: str, status: str):
         try:
             self.table.put_item(Item={"ip": ip_address, "status": status})
         except ClientError as e:
-            error_message = f"Error updating ip status for '{ip_address}': {e.response['Error']['Message']}"
-            print(error_message)
-            raise Exception(error_message)
+            self._handle_error(f"Error updating ip status for '{ip_address}': {e.response['Error']['Message']}")
 
     def get_ip_status(self, ip_address: str) -> dict:
         try:
             response = self.table.get_item(Key={"ip": ip_address})
             return response.get("Item", None)
         except ClientError as e:
-            error_message = f"Error retrieving ip address status for '{ip_address}': {e.response['Error']['Message']}"
-            print(error_message)
-            raise Exception(error_message)
+            self._handle_error(
+                f"Error retrieving ip address status for '{ip_address}': {e.response['Error']['Message']}")

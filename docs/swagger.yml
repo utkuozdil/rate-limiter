@@ -106,3 +106,50 @@ paths:
                   message:
                     type: string
                     example: "Internal server error"
+  /admin/reset-limit:
+    post:
+      summary: Reset limit for given IP address
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ip
+              properties:
+                ip:
+                  type: string
+                  description: The IP address to update.
+                  example: "192.168.1.1"
+      responses:
+        "200":
+          description: Rate limit has been reset successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Rate limit has been reset"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid request. Provide 'ip' to reset rate limit"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Internal server error"

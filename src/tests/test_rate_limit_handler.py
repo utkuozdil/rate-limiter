@@ -1,11 +1,11 @@
 import unittest
 from unittest.mock import patch
 import json
-from src.handlers.app import handler
+from src.handlers.rate_limit import handler
 
 
 class TestHandler(unittest.TestCase):
-    @patch("src.handlers.app.rate_limiter")
+    @patch("src.handlers.rate_limit.rate_limiter")
     def test_request_allowed(self, mock_rate_limiter):
         mock_rate_limiter.is_request_allowed.return_value = True, None
 
@@ -25,7 +25,7 @@ class TestHandler(unittest.TestCase):
 
         mock_rate_limiter.is_request_allowed.assert_called_once_with("192.168.1.1")
 
-    @patch("src.handlers.app.rate_limiter")
+    @patch("src.handlers.rate_limit.rate_limiter")
     def test_request_denied(self, mock_rate_limiter):
         mock_rate_limiter.is_request_allowed.return_value = False, None
 
@@ -45,7 +45,7 @@ class TestHandler(unittest.TestCase):
 
         mock_rate_limiter.is_request_allowed.assert_called_once_with("192.168.1.1")
 
-    @patch("src.handlers.app.rate_limiter")
+    @patch("src.handlers.rate_limit.rate_limiter")
     def test_internal_server_error(self, mock_rate_limiter):
         mock_rate_limiter.is_request_allowed.side_effect = Exception("Unexpected error")
 

@@ -20,7 +20,7 @@ plugins:
 
 functions:
   rateLimiter:
-    handler: src/handlers/app.handler
+    handler: src/handlers/rate_limit.handler
     events:
       - http:
           path: rate-limit
@@ -32,6 +32,20 @@ functions:
       - http:
           path: admin/ip-status
           method: post
+          cors: true
+  resetLimit:
+    handler: src/handlers/reset_limit.handler
+    events:
+      - http:
+          path: admin/reset-limit
+          method: post
+          cors: true
+  UpdateConfiguration:
+    handler: src/handlers/update_config.handler
+    events:
+      - http:
+          path: admin/configuration
+          method: put
           cors: true
 
 custom:
