@@ -1,11 +1,16 @@
 import json
 
-from src.core.config import DYNAMO_TABLE_NAME, RATE_LIMIT_THRESHOLD, RATE_LIMIT_WINDOW_SECONDS
+from src.core.config import DYNAMO_TABLE_NAME, RATE_LIMIT_THRESHOLD, RATE_LIMIT_WINDOW_SECONDS, \
+    DYNAMO_TABLE_NAME_IP_LIST
+from src.core.ip_list_manager import IPListManager
 from src.core.limiter import RateLimiter
 from src.services.dynamo import DynamoHelper
 
 dynamo_helper = DynamoHelper(DYNAMO_TABLE_NAME)
-rate_limiter = RateLimiter(dynamo_helper, threshold=RATE_LIMIT_THRESHOLD, window_seconds=RATE_LIMIT_WINDOW_SECONDS)
+dynamo_helper_for_ip_list = DynamoHelper(DYNAMO_TABLE_NAME_IP_LIST)
+ip_list_manager = IPListManager(dynamo_helper)
+rate_limiter = RateLimiter(dynamo_helper, ip_list_manager=ip_list_manager, threshold=RATE_LIMIT_THRESHOLD,
+                           window_seconds=RATE_LIMIT_WINDOW_SECONDS)
 
 
 def handler(event, _context):

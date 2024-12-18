@@ -51,3 +51,58 @@ paths:
                   message:
                     type: string
                     example: "Internal server error."
+  /admin/ip-status:
+    post:
+      summary: Add or update the status of an IP address
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ip
+                - status
+              properties:
+                ip:
+                  type: string
+                  description: The IP address to update.
+                  example: "192.168.1.1"
+                status:
+                  type: string
+                  description: The status to assign to the IP (whitelist or blacklist).
+                  enum:
+                    - whitelist
+                    - blacklist
+                  example: "blacklist"
+      responses:
+        "200":
+          description: IP status updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "IP address status has been updated"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid request. Provide 'ip' and 'status' as 'whitelist' or 'blacklist'."
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Internal server error"
