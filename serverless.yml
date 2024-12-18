@@ -12,6 +12,7 @@ provider:
         - "dynamodb:DescribeTable"
       Resource:
         - "arn:aws:dynamodb:us-east-1:*:table/RateLimitTable"
+        - "arn:aws:dynamodb:us-east-1:*:table/IPListTable"
 
 plugins:
   - serverless-dotenv-plugin

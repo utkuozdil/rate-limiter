@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 import json
 from src.handlers.app import handler
 
@@ -7,7 +7,7 @@ from src.handlers.app import handler
 class TestHandler(unittest.TestCase):
     @patch("src.handlers.app.rate_limiter")
     def test_request_allowed(self, mock_rate_limiter):
-        mock_rate_limiter.is_request_allowed.return_value = True
+        mock_rate_limiter.is_request_allowed.return_value = True, None
 
         event = {
             "headers": {
@@ -27,7 +27,7 @@ class TestHandler(unittest.TestCase):
 
     @patch("src.handlers.app.rate_limiter")
     def test_request_denied(self, mock_rate_limiter):
-        mock_rate_limiter.is_request_allowed.return_value = False
+        mock_rate_limiter.is_request_allowed.return_value = False, None
 
         event = {
             "headers": {

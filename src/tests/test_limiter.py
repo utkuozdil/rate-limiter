@@ -47,7 +47,7 @@ class TestRateLimiter(unittest.TestCase):
 
         result = self.rate_limiter.is_request_allowed("user123")
 
-        self.assertFalse(result)
+        self.assertEqual(result, (False, None))
         self.mock_dynamo_helper.update_rate_limit_data.assert_not_called()
 
     def test_request_after_time_window_reset(self):

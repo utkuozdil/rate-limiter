@@ -13,17 +13,18 @@ class RateLimiter:
         self.threshold = threshold
         self.window_seconds = window_seconds
 
-    def is_request_allowed(self, identifier: str) -> bool:
+    def is_request_allowed(self, identifier: str):
         ip_status = self.ip_list_manager.get_ip_address_status(ip_address=identifier)
         if ip_status == "blacklist":
             print(f"IP {identifier} is blacklisted.")
-            return False
-        if ip_status == "whitelist":
+            return False, ip_status
+        elif ip_status == "whitelist":
             print(f"IP {identifier} is whitelisted.")
-            return True
-        return self._apply_rate_limit(identifier)
+            return True, ip_status
+        else:
+            return self._apply_rate_limit(identifier)
 
-    def _apply_rate_limit(self, identifier: str) -> bool:
+    def _apply_rate_limit(self, identifier: str):
         current_time = int(time.time())
         item = self.dynamo_helper.get_rate_limit_data(identifier)
 
@@ -35,7 +36,7 @@ class RateLimiter:
 
             if current_time < time_window + self.window_seconds:
                 if request_count >= self.threshold:
-                    return False
+                    return False, None
                 self.dynamo_helper.update_rate_limit_data(identifier, request_count + 1, time_window, threshold,
                                                           window_seconds)
             else:
@@ -44,4 +45,4 @@ class RateLimiter:
         else:
             self.dynamo_helper.update_rate_limit_data(identifier, 1, current_time, self.threshold,
                                                       self.window_seconds)
-        return True
+        return True, None
