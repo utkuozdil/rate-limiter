@@ -1,0 +1,53 @@
+openapi: 3.0.0
+info:
+  title: Rate Limiter API
+  description: An API to limit and control requests based on IP address.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /rate-limit:
+    get:
+      summary: Check rate limit for a specific IP address
+      description: Endpoint to check if a request is allowed based on rate-limiting rules.
+      parameters:
+        - name: X-Forwarded-For
+          in: header
+          required: true
+          description: The IP address of the client making the request.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Request allowed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Request allowed."
+        '429':
+          description: Too many requests.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Too Many Requests. Try again later."
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Internal server error."
